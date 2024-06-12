@@ -1,8 +1,3 @@
-import ast
-import logging
-import os
-from datetime import datetime
-from functools import lru_cache
 from typing import Any, Dict
 
 from .base import BaseProcessor
@@ -67,6 +62,8 @@ Keep the references concise and avoid overly detailed or context-specific entrie
 Example:
 {cot_demo}
 """
+
+
 class Anonymizer(BaseProcessor):
     def __init__(self, client: Any):
         super().__init__(client)
@@ -76,8 +73,9 @@ class Anonymizer(BaseProcessor):
         self.temperature = 0.1
 
     def _identify_and_anonymize_pii(self, text: str) -> str:
-        return make_chat_completion(self.client, self.model, system_prompt=self.system_prompt, user_msg=text, context_length=self.context_length)
-    
+        return make_chat_completion(
+            self.client, self.model, system_prompt=self.system_prompt, user_msg=text, context_length=self.context_length
+        )
 
     def predict(self, input_: Dict[str, Any]) -> Dict[str, Any]:
         text = input_["text"]

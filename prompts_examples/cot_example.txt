@@ -44,7 +44,7 @@ Expected Output:
     ("Elm Street",): "[STREET2]"
 }
 
-Example 2: 
+Example 2:
 Input Example:
 '''
 1. Challenge: How do we make our customers adhere to the application of precautionary and preventive measures against Covid 19 pandemic. During the recovery period, we noticed the refusal of a small group of customers to apply precautionary measures such as having a negative PCR for no more than 72 hours, wearing a mask, not having a fever, and applying social distance, which had a great impact on employees and thus led to the interruption of service.

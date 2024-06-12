@@ -1,15 +1,9 @@
-import ast
-import logging
-import os
-from datetime import datetime
-from functools import lru_cache
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 
 from faker import Faker
 
 from .base import BaseProcessor
 from .common import make_chat_completion
-from .exceptions import UnparsableLLMOutputException
 
 fake = Faker()
 
@@ -77,8 +71,13 @@ class Deanonymizer(BaseProcessor):
 
     def _deanon_text_llm_output(self, text: str, replacement_keys: List[str]) -> str:
         user_msg = f"""input text:\n```\n{text}\n```\npii placeholders:\n```\n{replacement_keys}\n'''"""
-        return make_chat_completion(self.client, self.model, system_prompt=self.system_prompt, user_msg=user_msg, context_length=self.context_length)
-
+        return make_chat_completion(
+            self.client,
+            self.model,
+            system_prompt=self.system_prompt,
+            user_msg=user_msg,
+            context_length=self.context_length,
+        )
 
     def predict(self, input_: Dict[str, Any]) -> Dict[str, Any]:
         text = input_["text"]

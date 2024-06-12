@@ -1,17 +1,14 @@
-import ast
 import logging
 import os
 from abc import ABC, abstractmethod
-from datetime import datetime
-from functools import lru_cache
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 from faker import Faker
 
-from .exceptions import (MaxRetriesExceededException,
-                         UnparsableLLMOutputException)
+from .exceptions import MaxRetriesExceededException, UnparsableLLMOutputException
 
 fake = Faker()
+
 
 class BaseProcessor(ABC):
     def __init__(self, client: Any):
@@ -65,8 +62,8 @@ class BaseProcessor(ABC):
 
     def _extract_and_parse_replacement_dict(self, combined_output: str) -> Dict[str, str]:
         replacement_dict_str = combined_output.strip()
-        replacement_dict_str = replacement_dict_str[:replacement_dict_str.find("}") + 1]
-        replacement_dict_str = replacement_dict_str[replacement_dict_str.find("{"):]
+        replacement_dict_str = replacement_dict_str[: replacement_dict_str.find("}") + 1]
+        replacement_dict_str = replacement_dict_str[replacement_dict_str.find("{") :]
         try:
             replacement_dict = eval(replacement_dict_str)
         except (SyntaxError, ValueError) as e:
