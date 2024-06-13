@@ -9,7 +9,7 @@ spec:
     spec:
       containerConcurrency: 50
       timeoutSeconds: 300
-      serviceAccountName: ash-data-reader@ashley-services-development.iam.gserviceaccount.com
+      serviceAccountName: ash-pii-service@ashley-services-development.iam.gserviceaccount.com
       containers:
       - name: service
         image: us-east1-docker.pkg.dev/ashley-repositories/ashley-repos-docker/pii-service:latest
