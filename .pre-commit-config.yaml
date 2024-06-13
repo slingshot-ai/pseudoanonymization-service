@@ -23,7 +23,7 @@ repos:
     hooks:
       - id: isort
         name: isort (python)
-        args: [--profile, black]  # We should use "--multi-line", "0" but it conflicts with black
+        args: [--profile, black, --line-length=120]      # We should use "--multi-line", "0" but it conflicts with black
   - repo: https://github.com/psf/black
     rev: 22.10.0
     hooks:

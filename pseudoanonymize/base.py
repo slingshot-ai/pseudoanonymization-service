@@ -6,8 +6,8 @@ from typing import Any, Dict, Optional
 from faker import Faker
 from openai import OpenAI
 
-from .exceptions import MaxRetriesExceededException, UnparsableLLMOutputException
-from .utils import flatten_replacement_dict
+from pseudoanonymize.exceptions import MaxRetriesExceededException, UnparsableLLMOutputException
+from pseudoanonymize.utils import flatten_replacement_dict
 
 fake = Faker()
 
@@ -36,11 +36,11 @@ class BaseProcessor(ABC):
     def _setup_logger(self) -> logging.Logger:
         logger = logging.getLogger(self.__class__.__name__)
         logger.setLevel(logging.DEBUG)
-        log_dir = 'logs'
+        log_dir = "logs"
         os.makedirs(log_dir, exist_ok=True)
-        handler = logging.FileHandler(os.path.join(log_dir, f'{self.__class__.__name__}.log'))
+        handler = logging.FileHandler(os.path.join(log_dir, f"{self.__class__.__name__}.log"))
         handler.setLevel(logging.DEBUG)
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
         handler.setFormatter(formatter)
         logger.addHandler(handler)
         return logger
