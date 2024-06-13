@@ -6,6 +6,7 @@ from typing import Any, Dict, Optional
 from faker import Faker
 
 from .exceptions import MaxRetriesExceededException, UnparsableLLMOutputException
+from .utils import flatten_replacement_dict
 
 fake = Faker()
 
@@ -43,21 +44,22 @@ class BaseProcessor(ABC):
         logger.addHandler(handler)
         return logger
 
-    def _log_error(self, error_message: str, combined_output: str):
-        self.logger.error(f"Error: {error_message}\nCombined Output: {combined_output}")
+    def _log_error(self, error_message: str, invalid_model_output: str) -> None:
+        """
+        Log an error message in case where the model fails to produce a valid output.
+        """
+        self.logger.error(f"Error: {error_message}\Model Output: {invalid_model_output}")
 
-    def _parse_replacements(self, text, replacement_dict):
-        cleaned_dict = dict()
-        for key, replacement in replacement_dict.items():
-            if isinstance(key, str):
-                cleaned_dict[key] = replacement
-            else:
-                for key_instance in key:
-                    cleaned_dict[key_instance] = replacement
-
-        sorted_keys = sorted(cleaned_dict.keys(), key=len, reverse=True)
+    def _parse_replacements(self, text: str, replacement_dict: Dict[Any, str]) -> str:
+        """
+        Using the replacement_dict, replace each key present in the dict with the corresponding value.
+        """
+        flat_dict = flatten_replacement_dict(replacement_dict)
+        # Sort keys by length in descending order to replace longer strings first.
+        # This avoids edge cases where a shorter key that is a subset of a longer key is replaced first, potentially interfering with subsequent replacements.
+        sorted_keys = sorted(flat_dict.keys(), key=len, reverse=True)
         for key in sorted_keys:
-            text = text.replace(key, str(cleaned_dict[key]))
+            text = text.replace(key, str(flat_dict[key]))
         return text
 
     def _extract_and_parse_replacement_dict(self, combined_output: str) -> Dict[str, str]:
