@@ -101,7 +101,7 @@ jobs:
             mkdir -p deployment
             cp infra/<< parameters.environment >>/* deployment
             cd deployment
-            sed -i s/pii-service:latest/pii-service:$(./.circleci/infer-version-from-git.sh)/ pii-service.yaml
+            sed -i s/pii-service:latest/pii-service:$(../.circleci/infer-version-from-git.sh)/ pii-service.yaml
       - gcp-cli/setup:
           version: 457.0.0
       - run:
