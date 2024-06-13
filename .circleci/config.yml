@@ -1,0 +1,186 @@
+---
+version: 2.1
+
+development_only: &development_only
+  filters:
+    branches:
+      only: main
+    tags:
+      # Publish an development build of the service when a tag is pushed, except for when it looks like
+      # a real production tag (1.2.3) or a pre-production tag (1.2.3-beta)
+      only: /^(?!\d+\.\d+\.\d+.*).*/
+staging_only: &staging_only
+  filters:
+    tags:
+      # We trigger a pre-production for testing on any tags that look like a real version number with
+      # a suffix (1.2.3-beta)
+      only: /^\d+\.\d+\.\d+-.+/
+    branches:
+      ignore: /.*/
+production_only: &production_only
+  filters:
+    tags:
+      # We trigger a public production build on any tags that look like a real version number (1.2.3, 1.2.3.4)
+      only: /^\d+\.\d+\.\d+(\.\d+)?/
+    branches:
+      ignore: /.*/
+non_release_only: &non_release_only
+  filters:
+    branches:
+      ignore: main
+    tags:
+      ignore: /.*/
+
+orbs:
+  docker: circleci/docker@2.5.0
+  gcp-cli: circleci/gcp-cli@3.1.1
+
+always_run: &always_run
+  filters:
+    tags:
+      only: /.*/
+    branches:
+      only: /.*/
+release_only: &release_only
+  filters:
+    tags:
+      only: /^\d+\.\d+\.\d+/
+    branches:
+      ignore: /.*/
+main_only: &main_only
+  filters:
+    branches:
+      only: main
+
+executors:
+  python_executor:
+    docker:
+      - image: cimg/python:3.12.3
+  gcp_executor:
+    docker:
+      - image: cimg/gcp:2023.12
+
+jobs:
+  validate_python:
+    executor: python_executor
+    steps:
+      - checkout
+      - run:
+          name: Placeholder
+          command: echo "Add linter, unit tests, etc here"
+  build_and_publish_docker_images:
+    executor: python_executor
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build Docker image
+          command: |
+            cp infra/Dockerfile .
+            docker build -t us-east1-docker.pkg.dev/ashley-repositories/ashley-repos-docker/pii-service:$(./.circleci/infer-version-from-git.sh) .
+      - gcp-cli/setup:
+          version: 457.0.0
+      - run:
+          name: Set up Google Artifact Registry Auth
+          command:
+            gcloud auth configure-docker us-east1-docker.pkg.dev
+      - run:
+          name: Publish Docker images to Artifact Registry
+          command: |
+            docker push us-east1-docker.pkg.dev/ashley-repositories/ashley-repos-docker/pii-service:$(./.circleci/infer-version-from-git.sh)
+  deploy_services:
+    executor: gcp_executor
+    parameters:
+      environment:
+        type: string
+    steps:
+      - checkout
+      - run:
+          name: Prepare deployment files for << parameters.environment >>
+          command: |
+            mkdir -p deployment
+            cp infra/<< parameters.environment >>/* deployment
+            cd deployment
+            sed -i s/pii-service:latest/pii-service:$(../.circleci/infer-version-from-git.sh)/ pii-service.yaml
+      - gcp-cli/setup:
+          version: 457.0.0
+      - run:
+          name: Deploy everything to << parameters.environment >>
+          command: |
+            cd deployment
+            ./deploy.sh
+workflows:
+  run_sanity_checks:
+    jobs:
+      - validate_python:
+          context:
+            # NOTE: Bad name, but this gets access to our artifact registry for both Docker and others like Maven
+            # TODO: Set up distinct service accounts and contexts
+            - ash-docker-publishing
+          <<: *non_release_only
+  build_and_distribute_development:
+    jobs:
+      - validate_python:
+          context:
+            # NOTE: Bad name, but this gets access to our artifact registry for both Docker and others like Maven
+            # TODO: Set up distinct service accounts and contexts
+            - ash-docker-publishing
+          <<: *development_only
+      - build_and_publish_docker_images:
+          context:
+            - ash-docker-publishing
+          requires:
+            - validate_python
+          <<: *development_only
+      - deploy_services:
+          environment: development
+          context:
+            - ash-service-deployment-development
+          requires:
+            - validate_python
+            - build_and_publish_docker_images
+          <<: *development_only
+  build_and_distribute_staging:
+    jobs:
+      - validate_python:
+          context:
+            # NOTE: Bad name, but this gets access to our artifact registry for both Docker and others like Maven
+            # TODO: Set up distinct service accounts and contexts
+            - ash-docker-publishing
+          <<: *staging_only
+      - build_and_publish_docker_images:
+          context:
+            - ash-docker-publishing
+          requires:
+            - validate_python
+          <<: *staging_only
+      - deploy_services:
+          environment: staging
+          context:
+            - ash-service-deployment-staging
+          requires:
+            - validate_python
+            - build_and_publish_docker_images
+          <<: *staging_only
+  build_and_distribute_production:
+    jobs:
+      - validate_python:
+          context:
+            # NOTE: Bad name, but this gets access to our artifact registry for both Docker and others like Maven
+            # TODO: Set up distinct service accounts and contexts
+            - ash-docker-publishing
+          <<: *production_only
+      - build_and_publish_docker_images:
+          context:
+            - ash-docker-publishing
+          requires:
+            - validate_python
+          <<: *production_only
+      - deploy_services:
+          environment: production
+          context:
+            - ash-service-deployment-production
+          requires:
+            - validate_python
+            - build_and_publish_docker_images
+          <<: *production_only
