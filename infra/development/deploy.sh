@@ -3,4 +3,4 @@
 set -e
 
 echo "Deploy Cloud Run Service"
-gcloud run services replace pii-service-service.yaml
+gcloud run services replace pii-service.yaml
