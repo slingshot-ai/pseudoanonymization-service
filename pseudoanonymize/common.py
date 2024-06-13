@@ -1,12 +1,4 @@
-import os
-
-from dotenv import load_dotenv
 from joblib import Memory
-from openai import OpenAI
-
-load_dotenv()
-openai_api_key = os.getenv("OPENAI_API_KEY")
-client = OpenAI(api_key=openai_api_key)
 
 cachedir = "cache"
 memory = Memory(cachedir, verbose=0)
