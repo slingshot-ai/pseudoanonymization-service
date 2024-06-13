@@ -1,6 +1,7 @@
 from typing import Any, Dict, List
 
 from faker import Faker
+from openai import OpenAI
 
 from .base import BaseProcessor
 from .common import make_chat_completion
@@ -62,7 +63,7 @@ Expected output:
 
 
 class Deanonymizer(BaseProcessor):
-    def __init__(self, client: Any):
+    def __init__(self, client: OpenAI):
         super().__init__(client)
         self.system_prompt = prompt
         self.context_length = 4096

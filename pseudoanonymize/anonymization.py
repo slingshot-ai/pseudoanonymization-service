@@ -1,5 +1,7 @@
 from typing import Any, Dict
 
+from openai import OpenAI
+
 from .base import BaseProcessor
 from .common import make_chat_completion
 from .exceptions import UnparsableLLMOutputException
@@ -163,7 +165,7 @@ Challenge & Selection     Youssef Schneider, who has muscular discomfort, is one
 
 
 class Anonymizer(BaseProcessor):
-    def __init__(self, client: Any):
+    def __init__(self, client: OpenAI):
         super().__init__(client)
         self.system_prompt = chain_of_thought_prompt
         self.context_length = 4096

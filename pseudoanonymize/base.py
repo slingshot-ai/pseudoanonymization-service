@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Dict, Optional
 
 from faker import Faker
+from openai import OpenAI
 
 from .exceptions import MaxRetriesExceededException, UnparsableLLMOutputException
 from .utils import flatten_replacement_dict
@@ -12,7 +13,7 @@ fake = Faker()
 
 
 class BaseProcessor(ABC):
-    def __init__(self, client: Any):
+    def __init__(self, client: OpenAI):
         self.client = client
         self.logger = self._setup_logger()
 
