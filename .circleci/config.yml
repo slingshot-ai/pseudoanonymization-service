@@ -77,7 +77,7 @@ jobs:
           name: Build Docker image
           command: |
             cp infra/Dockerfile .
-            docker build -t us-east1-docker.pkg.dev/ashley-repositories/ashley-repos-docker/pii-service:$(../.circleci/infer-version-from-git.sh) .
+            docker build -t us-east1-docker.pkg.dev/ashley-repositories/ashley-repos-docker/pii-service:$(./.circleci/infer-version-from-git.sh) .
       - gcp-cli/setup:
           version: 457.0.0
       - run:
@@ -87,7 +87,7 @@ jobs:
       - run:
           name: Publish Docker images to Artifact Registry
           command: |
-            docker push us-east1-docker.pkg.dev/ashley-repositories/ashley-repos-docker/pii-service:$(../.circleci/infer-version-from-git.sh)
+            docker push us-east1-docker.pkg.dev/ashley-repositories/ashley-repos-docker/pii-service:$(./.circleci/infer-version-from-git.sh)
   deploy_services:
     executor: gcp_executor
     parameters:
@@ -101,7 +101,7 @@ jobs:
             mkdir -p deployment
             cp infra/<< parameters.environment >>/* deployment
             cd deployment
-            sed -i s/backend-service:latest/pii-service:$(../.circleci/infer-version-from-git.sh)/ pii-service.yaml
+            sed -i s/pii-service:latest/pii-service:$(./.circleci/infer-version-from-git.sh)/ pii-service.yaml
       - gcp-cli/setup:
           version: 457.0.0
       - run:
