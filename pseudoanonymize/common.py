@@ -8,8 +8,7 @@ def make_chat_completion(client, model, system_prompt, user_msg, temperature=0.1
     @memory.cache
     def call_client(
         model, system_prompt, user_msg, temperature=0.1, context_length=4096
-    ):  # TODO: should an argument to indicate who is calling to avoid weird situations where two different models recieve the same input file.
-        print("test")
+    ):  # TODO: should add an argument to indicate who is calling to avoid weird situations where two different models recieve the same input file and then falling back to the same cache!
         response = client.chat.completions.create(
             model=model,
             messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_msg}],
