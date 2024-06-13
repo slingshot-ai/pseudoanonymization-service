@@ -1,13 +1,16 @@
 from joblib import Memory
+from openai import OpenAI
 
 cachedir = "cache"
 memory = Memory(cachedir, verbose=0)
 
 
-def make_chat_completion(client, model, system_prompt, user_msg, temperature=0.1, context_length=4096):
+def make_chat_completion(
+    client: OpenAI, model: str, system_prompt: str, user_msg: str, temperature: float = 0.1, context_length: int = 4096
+):
     @memory.cache
     def call_client(
-        model, system_prompt, user_msg, temperature=0.1, context_length=4096
+        model: str, system_prompt: str, user_msg: str, temperature: float = 0.1, context_length: int = 4096
     ):  # TODO: should add an argument to indicate who is calling to avoid weird situations where two different models recieve the same input file and then falling back to the same cache!
         response = client.chat.completions.create(
             model=model,
