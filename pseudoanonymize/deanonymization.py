@@ -3,8 +3,8 @@ from typing import Any, Dict, List
 from faker import Faker
 from openai import OpenAI
 
-from .base import BaseProcessor
-from .common import make_chat_completion
+from pseudoanonymize.base import BaseProcessor
+from pseudoanonymize.common import make_chat_completion
 
 fake = Faker()
 

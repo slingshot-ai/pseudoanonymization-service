@@ -1,10 +1,8 @@
 from typing import Any, Dict
 
-from openai import OpenAI
-
-from .base import BaseProcessor
-from .common import make_chat_completion
-from .exceptions import UnparsableLLMOutputException
+from pseudoanonymize.base import BaseProcessor
+from pseudoanonymize.common import make_chat_completion
+from pseudoanonymize.exceptions import UnparsableLLMOutputException
 
 chain_of_thought_prompt = f"""
 You are tasked with identifying and replacing Personally Identifiable Information (PII) in a conversation. PII includes names, addresses, dates, and any other specific information that can be used to identify an individual. Follow these steps:
@@ -165,7 +163,7 @@ Challenge & Selection     Youssef Schneider, who has muscular discomfort, is one
 
 
 class Anonymizer(BaseProcessor):
-    def __init__(self, client: OpenAI):
+    def __init__(self, client: Any):
         super().__init__(client)
         self.system_prompt = chain_of_thought_prompt
         self.context_length = 4096
@@ -181,7 +179,7 @@ class Anonymizer(BaseProcessor):
         text = input_["text"]
         combined_output = self._identify_and_anonymize_pii(text)
 
-        parts = combined_output.split('2. Replacement Dictionary:')
+        parts = combined_output.split("2. Replacement Dictionary:")
         if len(parts) < 2:
             error_message = "LLM Produced unparsable output."
             self._log_error(error_message, combined_output)
