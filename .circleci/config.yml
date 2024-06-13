@@ -142,7 +142,7 @@ workflows:
           <<: *development_only
   build_and_distribute_staging:
     jobs:
-      - validate_kotlin:
+      - validate_python:
           context:
             # NOTE: Bad name, but this gets access to our artifact registry for both Docker and others like Maven
             # TODO: Set up distinct service accounts and contexts
