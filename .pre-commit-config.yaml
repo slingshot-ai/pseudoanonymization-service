@@ -1,0 +1,54 @@
+---
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0  # Use the ref you want to point at
+    hooks:
+      - id: trailing-whitespace
+      - id: check-added-large-files
+        args: [--maxkb=500]
+      - id: check-case-conflict
+      - id: check-json
+      - id: check-toml
+      - id: debug-statements
+      - id: detect-private-key
+
+  - repo: https://github.com/pycqa/autoflake
+    rev: v1.7.7
+    hooks:
+      - id: autoflake
+        language_version: python3
+        args: [--in-place, --remove-all-unused-imports, --ignore-init-module-imports]
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        name: isort (python)
+        args: [--profile, black, --line-length=120]      # We should use "--multi-line", "0" but it conflicts with black
+  - repo: https://github.com/psf/black
+    rev: 22.10.0
+    hooks:
+      - id: black
+        language_version: python3.10
+        args:
+          - --line-length=120
+          - --skip-string-normalization
+          - --skip-magic-trailing-comma
+  - repo: https://github.com/lyz-code/yamlfix/
+    rev: 1.1.0
+    hooks:
+      - id: yamlfix
+  - repo: https://github.com/executablebooks/mdformat
+    rev: 0.7.16
+    hooks:
+      - id: mdformat
+        args: [--wrap=120]
+        files: .+\.md$
+        additional_dependencies:
+          - mdformat-black
+  - repo: https://github.com/jazzband/pip-tools
+    rev: 6.13.0
+    hooks:
+      - id: pip-compile
+        name: pip-compile requirements
+        files: .*\.in$
+        args: [--resolver=backtracking, requirements.in]
