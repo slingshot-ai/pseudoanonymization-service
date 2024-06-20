@@ -2,16 +2,15 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-RUN pip install pipenv uvicorn
+RUN pip install uvicorn
 
-COPY Pipfile .
-COPY Pipfile.lock .
-
-RUN pipenv install
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
 COPY main.py .
 COPY pseudoanonymize pseudoanonymize
-COPY prompts_examples prompts_examples
+COPY models models
+
 EXPOSE 8000
 
-CMD ["pipenv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
