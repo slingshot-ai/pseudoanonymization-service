@@ -76,7 +76,18 @@ jobs:
       - run:
           name: Attempt to download ash-proto
           command: |
-            printenv | awk -F= '{print $1}'
+            echo $GCLOUD_SERVICE_KEY | gcloud auth activate-service-account --key-file=-
+            gcloud config set project $GOOGLE_PROJECT_ID
+
+            mkdir -p ~/.pip
+            cat <<EOT > ~/.pip/pip.conf
+            [global]
+            index-url = https://us-east1-python.pkg.dev/ashley-repositories/ashley-python/simple/
+
+            [install]
+            trusted-host = us-east1-python.pkg.dev
+            EOT
+            pip install ashley_protos==2.3.7
       - run:
           name: Build Docker image
           command: |
