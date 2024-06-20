@@ -74,8 +74,11 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
-          name: Attempt to download ash-proto
+          name: Attempt to download ashley_protos
           command: |
+            export GOOGLE_PROJECT_ID=${GOOGLE_PROJECT_ID}
+            export GCLOUD_SERVICE_KEY=${GCLOUD_SERVICE_KEY}
+
             echo $GCLOUD_SERVICE_KEY | gcloud auth activate-service-account --key-file=-
             gcloud config set project $GOOGLE_PROJECT_ID
 
@@ -87,6 +90,7 @@ jobs:
             [install]
             trusted-host = us-east1-python.pkg.dev
             EOT
+
             pip install ashley_protos==2.3.7
       - run:
           name: Build Docker image
