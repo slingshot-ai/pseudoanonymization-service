@@ -76,7 +76,7 @@ jobs:
       - run:
           name: Build Docker image
           command: |
-            docker build --build-arg GOOGLE_PROJECT_ID=${GOOGLE_PROJECT_ID} --build-arg GCLOUD_SERVICE_KEY=${GCLOUD_SERVICE_KEY} -t us-east1-docker.pkg.dev/ashley-repositories/ashley-repos-docker/pii-service:$(./.circleci/infer-version-from-git.sh) .
+            docker build --build-arg GOOGLE_PROJECT_ID=${GOOGLE_PROJECT_ID} --build-arg GCLOUD_SERVICE_KEY="${GCLOUD_SERVICE_KEY}" -t us-east1-docker.pkg.dev/ashley-repositories/ashley-repos-docker/pii-service:$(./.circleci/infer-version-from-git.sh) .
       - gcp-cli/setup:
           version: 457.0.0
       - run:
