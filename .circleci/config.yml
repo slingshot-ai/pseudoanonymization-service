@@ -35,19 +35,19 @@ orbs:
   docker: circleci/docker@2.5.0
   gcp-cli: circleci/gcp-cli@3.1.1
 
-always_run: &always_run
+always_run:
   filters:
     tags:
       only: /.*/
     branches:
       only: /.*/
-release_only: &release_only
+release_only:
   filters:
     tags:
       only: /^\d+\.\d+\.\d+/
     branches:
       ignore: /.*/
-main_only: &main_only
+main_only:
   filters:
     branches:
       only: main
@@ -74,6 +74,10 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
+          name: Attempt to download ash-proto
+          command: |
+            printenv | awk -F= '{print $1}'
+      - run:
           name: Build Docker image
           command: |
             cp infra/Dockerfile .
@@ -82,8 +86,7 @@ jobs:
           version: 457.0.0
       - run:
           name: Set up Google Artifact Registry Auth
-          command:
-            gcloud auth configure-docker us-east1-docker.pkg.dev
+          command: gcloud auth configure-docker us-east1-docker.pkg.dev
       - run:
           name: Publish Docker images to Artifact Registry
           command: |
