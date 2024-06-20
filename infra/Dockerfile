@@ -23,11 +23,7 @@ RUN printf '%s' "$GCLOUD_SERVICE_KEY" > /tmp/key.json && \
     gcloud config set project $GOOGLE_PROJECT_ID
 
 # Configure pip to use the private repository
-RUN mkdir -p ~/.pip && \
-    echo "[global]\nindex-url = https://us-east1-python.pkg.dev/ashley-repositories/ashley-python/simple/\n\n[install]\ntrusted-host = us-east1-python.pkg.dev" > ~/.pip/pip.conf
-
-# Install the Python package
-RUN pip install ashley_protos==2.3.7
+RUN pip install --extra-index-url "https://oauth2accesstoken:$(gcloud auth print-access-token)@us-east1-python.pkg.dev/ashley-repositories/ashley-python/simple/" ashley_protos==2.3.7
 
 # Install uvicorn
 RUN pip install uvicorn
