@@ -18,7 +18,7 @@ ARG GOOGLE_PROJECT_ID
 ARG GCLOUD_SERVICE_KEY
 
 # Configure gcloud with the provided service account key
-RUN echo "$GCLOUD_SERVICE_KEY" > /tmp/key.json && \
+RUN printf '%s' "$GCLOUD_SERVICE_KEY" > /tmp/key.json && \
     gcloud auth activate-service-account --key-file=/tmp/key.json && \
     gcloud config set project $GOOGLE_PROJECT_ID
 
