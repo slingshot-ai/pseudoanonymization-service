@@ -1,4 +1,3 @@
-# %%
 import os
 from copy import deepcopy
 from typing import Any, Dict
@@ -107,19 +106,20 @@ async def pseudoanonymize(request: AnonymizeRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/read_conversation_for_user")
-async def read_conversation_for_user(request: Request):
-    request_body = await request.body()
-    conv = ReadConversationForUserResponse.FromString(request_body)
-    sessions = conv.sessions
-    new_sessions = deepcopy(sessions)
+@app.post("/anonymize_ash_conversation")
+async def anonymize_ash_conversation(request: Request):
+    def gather_text(entries, max_length, sep_seq):
+        """
+        Gather text from user and therapist messages within the given length limit.
 
-    max_length = 2000
-    sep_seq = "-\n-"
+        Args:
+            entries (list): List of conversation entries.
+            max_length (int): Maximum length of the gathered text.
+            sep_seq (str): Separator sequence used between messages.
 
-    for i in range(len(sessions)):
-        print(i)
-        entries = sessions[i].entries
+        Returns:
+            tuple: A tuple containing gathered text, indices, and types.
+        """
         gathered_text = ""
         indices = []
         types = []
@@ -128,31 +128,55 @@ async def read_conversation_for_user(request: Request):
             user_msg = entries[j].user_message.content
             ther_msg = entries[j].therapist_message.content
 
-            if user_msg:
-                if len(gathered_text) + len(user_msg) > max_length:
-                    break
+            if user_msg and len(gathered_text) + len(user_msg) <= max_length:
                 gathered_text += user_msg + sep_seq
-                indices.append((i, j))
+                indices.append(j)
                 types.append("user")
 
-            if ther_msg:
-                if len(gathered_text) + len(ther_msg) > max_length:
-                    break
+            if ther_msg and len(gathered_text) + len(ther_msg) <= max_length:
                 gathered_text += ther_msg + sep_seq
-                indices.append((i, j))
+                indices.append(j)
                 types.append("therapist")
 
-        if gathered_text:
-            anon_msg, replacement_dict = dspy_anonymizer.predict(dict(text=gathered_text.strip()))
-            anon_messages = anon_msg.split(sep_seq)
+        return gathered_text, indices, types
 
-            anon_index = 0
-            for (i_idx, j_idx), msg_type in zip(indices, types):
-                if msg_type == "user":
-                    new_sessions[i_idx].entries[j_idx].user_message.content = anon_messages[anon_index]
-                else:
-                    new_sessions[i_idx].entries[j_idx].therapist_message.content = anon_messages[anon_index]
-                anon_index += 1
+    def update_entries_with_anonymized_text(entries, indices, types, anon_messages):
+        """
+        Update the conversation entries with the anonymized text.
+
+        Args:
+            entries (list): List of conversation entries.
+            indices (list): Indices of the entries to be updated.
+            types (list): Types of the messages (user or therapist).
+            anon_messages (list): Anonymized messages.
+        """
+        for j_idx, msg_type in zip(indices, types):
+            if msg_type == "user":
+                entries[j_idx].user_message.content = anon_messages.pop(0)
+            else:
+                entries[j_idx].therapist_message.content = anon_messages.pop(0)
+
+    request_body = await request.body()
+    conv = ReadConversationForUserResponse.FromString(request_body)
+    new_sessions = deepcopy(conv.sessions)
+
+    max_length = 2000
+    sep_seq = "-\n-"
+
+    for i in range(len(new_sessions)):
+        entries = new_sessions[i].entries
+        gathered_text, indices, types = gather_text(entries, max_length, sep_seq)
+
+        if gathered_text:
+            anon_messages, _ = dspy_anonymizer.predict(dict(text=gathered_text.strip()))
+            anon_messages.split(sep_seq)
+            update_entries_with_anonymized_text(entries, indices, types, anon_messages)
 
     conv.sessions[:] = new_sessions
     return Response(content=conv.SerializeToString(), media_type="application/protobuf")
+
+
+# TODO: change endpoint called from the kotlin side to /anonymize_ash_conversation. This is just a temporary solution.
+@app.post("/read_conversation_for_user")
+async def anonymize_ash_conversation_v1(request: Request):
+    return await anonymize_ash_conversation(request)
