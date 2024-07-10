@@ -14,7 +14,7 @@ from pydantic import BaseModel
 
 from pseudoanonymize.anonymization import Anonymizer
 from pseudoanonymize.deanonymization import Deanonymizer
-from pseudoanonymize.direct_json_anonymization import JsonDirectAnonymizer
+from pseudoanonymize.direct_json_anonymization import JSON_FEW_SHOT_PROMPT, JSON_SYSTEM_PROMPT, JsonDirectAnonymizer
 from pseudoanonymize.dspy_anonmization import DspyAnon
 from pseudoanonymize.exceptions import MaxRetriesExceededException
 from pseudoanonymize.utils import chunk_by_line, flatten_replacement_dict
@@ -30,7 +30,15 @@ dspy.settings.configure(lm=turbo)
 
 # models
 anonymizer = Anonymizer(client=client)
-dierct_anonymizer = JsonDirectAnonymizer(client=client, model="gpt-4o")
+model = "gpt-4o"
+prompt = JSON_SYSTEM_PROMPT + JSON_FEW_SHOT_PROMPT
+dierct_anonymizer_gpt4o = JsonDirectAnonymizer(client=client, model=model, system_prompt=prompt)
+
+model = "ft:gpt-3.5-turbo-0125:slingshot-daniel:pii-dist-gpt3:9ekTDaTH"
+prompt = JSON_SYSTEM_PROMPT
+direct_anonymizer_gpt35ft = JsonDirectAnonymizer(client=client, model=model, system_prompt=prompt)
+
+
 deanonymizer = Deanonymizer(client=client)
 dspy_anonymizer = DspyAnon()
 
@@ -82,14 +90,15 @@ async def anonymize(request: AnonymizeRequest):
 @app.post("/anonymize_v2", response_model=AnonymizeResponse)
 async def anonymize_v2(request: AnonymizeRequest):
     try:
-        text_chunks = chunk_by_line(request.text, 50)
+        text_chunks = chunk_by_line(request.text, 2000)
+        print(len(text_chunks))
         anonymized_text_list = []
         replacement_dict = {}
 
         with ThreadPoolExecutor() as executor:
             futures = []
             for chunk in text_chunks:
-                future = executor.submit(dierct_anonymizer.retry_prediction, {"text": chunk}, request.retries)
+                future = executor.submit(direct_anonymizer_gpt35ft.retry_prediction, {"text": chunk}, request.retries)
                 futures.append(future)
 
             for future in futures:
