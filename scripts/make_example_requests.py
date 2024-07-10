@@ -26,32 +26,59 @@ def write_to_file(filename, content):
         file.write(content)
 
 
-# Test the /anonymize endpoint
-anonymize_response = requests.post("http://127.0.0.1:8000/anonymize", json={"text": example})
+# # Test the /anonymize endpoint
+# anonymize_response = requests.post("http://127.0.0.1:8000/anonymize", json={"text": example})
+# if anonymize_response.status_code == 200:
+#     anonymized_data = anonymize_response.json()
+#     write_to_file('anonymized_text.txt', anonymized_data["anonymizedText"])
+#     write_to_file('replacement_dict.txt', str(anonymized_data["replacementDict"]))
+# else:
+#     print("Anonymize request failed:", anonymize_response.status_code, anonymize_response.text)
+
+# # Test the /deanonymize endpoint
+# if anonymize_response.status_code == 200:
+#     deanonymize_response = requests.post(
+#         "http://127.0.0.1:8000/deanonymize",
+#         json={"text": anonymized_data["anonymizedText"], "replacementDict": anonymized_data["replacementDict"]},
+#     )
+#     if deanonymize_response.status_code == 200:
+#         deanonymized_data = deanonymize_response.json()
+#         write_to_file('deanonymized_text.txt', deanonymized_data["deanonymizedText"])
+#     else:
+#         print("Deanonymize request failed:", deanonymize_response.status_code, deanonymize_response.text)
+
+# # Test the /pseudoanonymize endpoint
+# pseudoanonymize_response = requests.post("http://127.0.0.1:8000/pseudoanonymize", json={"text": example})
+# if pseudoanonymize_response.status_code == 200:
+#     pseudoanonymize_data = pseudoanonymize_response.json()
+#     write_to_file('pseudoanonymized_anonymized_text.txt', pseudoanonymize_data["anonymizedText"])
+#     write_to_file('pseudoanonymized_deanonymized_text.txt', pseudoanonymize_data["deanonymizedText"])
+# else:
+#     print("Pseudoanonymize request failed:", pseudoanonymize_response.status_code, pseudoanonymize_response.text)
+
+
+# Test the /anonymize_v2 endpoint
+long_example = """
+1assistant: Hi Alex, nice to meet you. I've just had a look at your intake form. Can you tell me a bit more about yourself, and maybe why you're here?
+2assistant: Hi John, nice to meet you. I've just had a look at your intake form. Can you tell me a bit more about yourself, and maybe why you're here?
+3assistant: Hi Jhon, nice to meet you. I've just had a look at your intake form. Can you tell me a bit more about yourself, and maybe why you're here?
+4assistant: Hi Yod, nice to meet you. I've just had a look at your intake form. Can you tell me a bit more about yourself, and maybe why you're here?
+5assistant: Hi lqee2, nice to meet you. I've just had a look at your intake form. Can you tell me a bit more about yourself, and maybe why you're here?
+6assistant: Hi Alex, nice to meet you. I've just had a look at your intake form. Can you tell me a bit more about yourself, and maybe why you're here?
+7assistant: Hi John, nice to meet you. I've just had a look at your intake form. Can you tell me a bit more about yourself, and maybe why you're here?
+8assistant: Hi Jhon, nice to meet you. I've just had a look at your intake form. Can you tell me a bit more about yourself, and maybe why you're here?
+9assistant: Hi Yod, nice to meet you. I've just had a look at your intake form. Can you tell me a bit more about yourself, and maybe why you're here?
+10assistant: Hi lqee2, nice to meet you. I've just had a look at your intake form. Can you tell me a bit more about yourself, and maybe why you're here?
+11assistant: Hi Alex, nice to meet you. I've just had a look at your intake form. Can you tell me a bit more about yourself, and maybe why you're here?
+12assistant: Hi John, nice to meet you. I've just had a look at your intake form. Can you tell me a bit more about yourself, and maybe why you're here?
+13assistant: Hi Jhon, nice to meet you. I've just had a look at your intake form. Can you tell me a bit more about yourself, and maybe why you're here?
+14assistant: Hi Yod, nice to meet you. I've just had a look at your intake form. Can you tell me a bit more about yourself, and maybe why you're here?
+15assistant: Hi lqee2, nice to meet you. I've just had a look at your intake form. Can you tell me a bit more about yourself, and maybe why you're here?
+"""
+anonymize_response = requests.post("http://127.0.0.1:8000/anonymize_v2", json={"text": long_example})
 if anonymize_response.status_code == 200:
     anonymized_data = anonymize_response.json()
-    write_to_file('anonymized_text.txt', anonymized_data["anonymizedText"])
-    write_to_file('replacement_dict.txt', str(anonymized_data["replacementDict"]))
+    write_to_file('anonymized_v2_text.txt', anonymized_data["anonymizedText"])
+    write_to_file('replacement_v2_dict.txt', str(anonymized_data["replacementDict"]))
 else:
     print("Anonymize request failed:", anonymize_response.status_code, anonymize_response.text)
-
-# Test the /deanonymize endpoint
-if anonymize_response.status_code == 200:
-    deanonymize_response = requests.post(
-        "http://127.0.0.1:8000/deanonymize",
-        json={"text": anonymized_data["anonymizedText"], "replacementDict": anonymized_data["replacementDict"]},
-    )
-    if deanonymize_response.status_code == 200:
-        deanonymized_data = deanonymize_response.json()
-        write_to_file('deanonymized_text.txt', deanonymized_data["deanonymizedText"])
-    else:
-        print("Deanonymize request failed:", deanonymize_response.status_code, deanonymize_response.text)
-
-# Test the /pseudoanonymize endpoint
-pseudoanonymize_response = requests.post("http://127.0.0.1:8000/pseudoanonymize", json={"text": example})
-if pseudoanonymize_response.status_code == 200:
-    pseudoanonymize_data = pseudoanonymize_response.json()
-    write_to_file('pseudoanonymized_anonymized_text.txt', pseudoanonymize_data["anonymizedText"])
-    write_to_file('pseudoanonymized_deanonymized_text.txt', pseudoanonymize_data["deanonymizedText"])
-else:
-    print("Pseudoanonymize request failed:", pseudoanonymize_response.status_code, pseudoanonymize_response.text)

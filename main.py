@@ -1,4 +1,5 @@
 import os
+from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
 from typing import Any, Dict
 
@@ -13,9 +14,10 @@ from pydantic import BaseModel
 
 from pseudoanonymize.anonymization import Anonymizer
 from pseudoanonymize.deanonymization import Deanonymizer
+from pseudoanonymize.direct_json_anonymization import JsonDirectAnonymizer
 from pseudoanonymize.dspy_anonmization import DspyAnon
 from pseudoanonymize.exceptions import MaxRetriesExceededException
-from pseudoanonymize.utils import flatten_replacement_dict
+from pseudoanonymize.utils import chunk_by_line, flatten_replacement_dict
 
 app = FastAPI()
 
@@ -28,6 +30,7 @@ dspy.settings.configure(lm=turbo)
 
 # models
 anonymizer = Anonymizer(client=client)
+dierct_anonymizer = JsonDirectAnonymizer(client=client, model="gpt-4o")
 deanonymizer = Deanonymizer(client=client)
 dspy_anonymizer = DspyAnon()
 
@@ -72,6 +75,34 @@ async def anonymize(request: AnonymizeRequest):
         prediction = anonymizer.retry_prediction({"text": request.text}, request.retries)
         flattened_dict = flatten_replacement_dict(prediction["replacement_dict"])
         return AnonymizeResponse(anonymized_text=prediction["anonymized_text"], replacement_dict=flattened_dict)
+    except MaxRetriesExceededException as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/anonymize_v2", response_model=AnonymizeResponse)
+async def anonymize_v2(request: AnonymizeRequest):
+    try:
+        text_chunks = chunk_by_line(request.text, 50)
+        anonymized_text_list = []
+        replacement_dict = {}
+
+        with ThreadPoolExecutor() as executor:
+            futures = []
+            for chunk in text_chunks:
+                future = executor.submit(dierct_anonymizer.retry_prediction, {"text": chunk}, request.retries)
+                futures.append(future)
+
+            for future in futures:
+                try:
+                    prediction = future.result()
+                except MaxRetriesExceededException as e:
+                    raise HTTPException(status_code=500, detail=str(e))
+
+                anonymized_text_list.append(prediction["anonymized_text"])
+                replacement_dict.update(prediction["replacement_dict"])
+
+        anonymized_text = "\n".join(anonymized_text_list)
+        return AnonymizeResponse(anonymized_text=anonymized_text, replacement_dict=replacement_dict)
     except MaxRetriesExceededException as e:
         raise HTTPException(status_code=500, detail=str(e))
 
