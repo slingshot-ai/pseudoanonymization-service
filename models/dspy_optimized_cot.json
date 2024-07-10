@@ -1,0 +1,96 @@
+{
+  "cot": {
+    "lm": null,
+    "traces": [],
+    "train": [],
+    "demos": [
+      {
+        "augmented": true,
+        "unanonymized_text": "Alice: Of course! His phone number is 555-123-4567. Speaking of AI startups, I'm planning a visit to a lab in Palo Alto next month, on October 15th. They're doing some cutting-edge work with neural networks.",
+        "rationale": "Unanonymized Text: Alice: Of course! His phone number is 555-123-4567. Speaking of AI startups, I'm planning a visit to a lab in Palo Alto next month, on October 15th. They're doing some cutting-edge work with neural networks.\nReasoning: Let's think step by step in order to identify the PII candidates. We start by looking for any names, geographical locations smaller than a state, dates, personal phone numbers, and any other uniquely identifying information.\n\n1. The name \"Alice\" is a first name.\n2. The phone number \"555-123-4567\" is a personal phone number.\n3. The geographical location \"Palo Alto\" is a city.\n4. The date \"October 15th\" is a specific date.",
+        "PII_candidates": "- Name: Alice\n- Phone number: 555-123-4567\n- Geographical location: Palo Alto\n- Date: October 15th"
+      },
+      {
+        "augmented": true,
+        "unanonymized_text": "John: Great advice, Lisa. I\u2019ll definitely do that. Also, I heard that you're the city's state chess champion! Congrats, that\u2019s quite an achievement.",
+        "rationale": "Unanonymized Text: John: Great advice, Lisa. I\u2019ll definitely do that. Also, I heard that you're the city's state chess champion! Congrats, that\u2019s quite an achievement.\nReasoning: Let's think step by step in order to identify the PII candidates. We start by identifying names, geographical locations smaller than a state, and unique achievements. In this text, \"John\" and \"Lisa\" are names, \"the city's\" indicates a geographical location smaller than a state, and \"state chess champion\" is a unique achievement.",
+        "PII_candidates": "John, Lisa, the city's, state chess champion"
+      },
+      {
+        "augmented": true,
+        "unanonymized_text": "Alex: Sure, that would be great. By the way, do you still have the contact for that supplier? I think their phone number was something like (555) 123-****.",
+        "rationale": "Unanonymized Text: Alex: Sure, that would be great. By the way, do you still have the contact for that supplier? I think their phone number was something like (555) 123-****.\nReasoning: Let's think step by step in order to identify the PII candidates. We start by identifying any names, geographical locations, dates, personal web URLs, ages, personal phone numbers, personal email addresses, Social Security numbers, medical record numbers, account numbers, license numbers, vehicle identifiers, device identifiers, personal IP address numbers, or anything else uniquely identifying. In this text, we have:\n1. A name: \"Alex\"\n2. A partial phone number: \"(555) 123-****\"",
+        "PII_candidates": "1. Name: \"Alex\"\n2. Partial phone number: \"(555) 123-****\""
+      },
+      {
+        "augmented": true,
+        "unanonymized_text": "Alex: Yes, they finally confirmed it's coming in next week. They gave me a tracking number: 1Z789X**.",
+        "rationale": "Unanonymized Text: Alex: Yes, they finally confirmed it's coming in next week. They gave me a tracking number: 1Z789X**.\nReasoning: Let's think step by step in order to identify the PII candidates. We start by identifying any names, geographical locations, dates, personal web URLs, ages, personal phone numbers, personal email addresses, Social Security numbers, medical record numbers, account numbers, license numbers, vehicle identifiers, device identifiers, and personal IP address numbers. In this text, \"Alex\" is a name, and the tracking number \"1Z789X**\" could be considered a unique identifier.",
+        "PII_candidates": "Alex, 1Z789X**"
+      },
+      {
+        "unanonymized_text": "Oliver: They certainly have. By the way, do you remember the old Johnson house on Elm Street?",
+        "anonymized_text": "[First Name]: They certainly have. By the way, do you remember the old [First Name] house on [Full Address]?"
+      },
+      {
+        "unanonymized_text": "Bob: Sure thing, Alice. Just message me your number as well, and I'll text you if I come across any other interesting blockchain articles.",
+        "anonymized_text": "[First Name]: Sure thing, [First Name]. Just message me your number as well, and I'll text you if I come across any other interesting blockchain articles."
+      }
+    ],
+    "signature_instructions": "\n    Identify Personally Identifiable Information (PIIs) in the text. PIIs include:\n        - Names (e.g., first name, last name)\n        - Geographical locations smaller than a state (e.g., street address, city, ZIP code)\n        - Dates (e.g., birth date, admission date)\n        - Personal web URLs\n        - Ages\n        - Personal phone numbers and fax numbers\n        - Personal email addresses\n        - Social Security numbers\n        - Medical record numbers and health plan beneficiary numbers\n        - Account numbers (e.g., credit card)\n        - License numbers\n        - Vehicle identifiers (e.g., license plate numbers)\n        - Device identifiers (e.g., serial numbers)\n        - Personal IP address numbers\n\n    Or anything else uniquely identifying, such as:\n        - Rare disease information\n        - Specific topic names at a conference\n        - Unique research grants\n        - Niche specialties (e.g., a rare research project)\n        - Unique facial features (e.g., scars)\n        - Obscure travel destinations\n        - Unusual transportation methods\n        - Unique achievements (e.g., state chess champion)\n        - Unusual hobbies (e.g., competitive eating)\n    ",
+    "signature_prefix": "PII Candidates:",
+    "extended_signature_instructions": "\n    Identify Personally Identifiable Information (PIIs) in the text. PIIs include:\n        - Names (e.g., first name, last name)\n        - Geographical locations smaller than a state (e.g., street address, city, ZIP code)\n        - Dates (e.g., birth date, admission date)\n        - Personal web URLs\n        - Ages\n        - Personal phone numbers and fax numbers\n        - Personal email addresses\n        - Social Security numbers\n        - Medical record numbers and health plan beneficiary numbers\n        - Account numbers (e.g., credit card)\n        - License numbers\n        - Vehicle identifiers (e.g., license plate numbers)\n        - Device identifiers (e.g., serial numbers)\n        - Personal IP address numbers\n\n    Or anything else uniquely identifying, such as:\n        - Rare disease information\n        - Specific topic names at a conference\n        - Unique research grants\n        - Niche specialties (e.g., a rare research project)\n        - Unique facial features (e.g., scars)\n        - Obscure travel destinations\n        - Unusual transportation methods\n        - Unique achievements (e.g., state chess champion)\n        - Unusual hobbies (e.g., competitive eating)\n    ",
+    "extended_signature_prefix": "PII Candidates:"
+  },
+  "replacement_dict_pred": {
+    "lm": null,
+    "traces": [],
+    "train": [],
+    "demos": [
+      {
+        "augmented": true,
+        "unanonymized_text": "Alice: Of course! His phone number is 555-123-4567. Speaking of AI startups, I'm planning a visit to a lab in Palo Alto next month, on October 15th. They're doing some cutting-edge work with neural networks.",
+        "PII_candidates": "- Name: Alice\n- Phone number: 555-123-4567\n- Geographical location: Palo Alto\n- Date: October 15th",
+        "rationale": "Reasoning: Let's think step by step in order to produce the replacement dictionary after examination. We need to identify and replace each PII candidate in the text with a placeholder. Here are the steps:\n\n1. Identify each PII candidate in the text.\n2. Create a dictionary mapping each identified PII to a placeholder.\n3. Ensure that even if there are typos or slight variations, the relevant keys are included.\n\nLet's examine the PII candidates and create the dictionary:\n\n1. Name: \"Alice\" is a name and appears in the text.\n2. Phone number: \"555-123-4567\" is a phone number and appears in the text.\n3. Geographical location: \"Palo Alto\" is a geographical location and appears in the text.\n4. Date: \"October 15th\" is a date and appears in the text.",
+        "replacement_dictionary_all_potential": "A dictionary mapping all potential PIIs to placeholders enclosed in brackets.\n\n```python\n{\n    \"Alice\": \"[NAME]\",\n    \"555-123-4567\": \"[PHONE_NUMBER]\",\n    \"Palo Alto\": \"[LOCATION]\",\n    \"October 15th\": \"[DATE]\"\n}\n```",
+        "replacement_dictionary_after_examination": "A dictionary mapping examined and validated PIIs to placeholders enclosed in brackets.\n\n```python\n{\n    \"Alice\": \"[NAME]\",\n    \"555-123-4567\": \"[PHONE_NUMBER]\",\n    \"Palo Alto\": \"[LOCATION]\",\n    \"October 15th\": \"[DATE]\"\n}\n```"
+      },
+      {
+        "augmented": true,
+        "unanonymized_text": "Alice: Of course! His phone number is 555-123-4567. Speaking of AI startups, I'm planning a visit to a lab in Palo Alto next month, on October 15th. They're doing some cutting-edge work with neural networks.",
+        "PII_candidates": "- Name: Alice\n- Phone number: 555-123-4567\n- Geographical location: Palo Alto\n- Date: October 15th",
+        "rationale": "Reasoning: Let's think step by step in order to produce the replacement dictionary after examination. We need to identify and replace each PII candidate in the text with a placeholder. Here are the steps:\n\n1. Identify each PII candidate in the text.\n2. Create a dictionary mapping each identified PII to a placeholder.\n3. Ensure that even if there are typos or slight variations, the relevant keys are included.\n\nLet's examine the PII candidates and create the dictionary:\n\n1. Name: \"Alice\" is a name and appears in the text.\n2. Phone number: \"555-123-4567\" is a phone number and appears in the text.\n3. Geographical location: \"Palo Alto\" is a geographical location and appears in the text.\n4. Date: \"October 15th\" is a date and appears in the text.",
+        "replacement_dictionary_all_potential": "A dictionary mapping all potential PIIs to placeholders enclosed in brackets.\n\n```python\n{\n    \"Alice\": \"[NAME]\",\n    \"555-123-4567\": \"[PHONE_NUMBER]\",\n    \"Palo Alto\": \"[LOCATION]\",\n    \"October 15th\": \"[DATE]\"\n}\n```",
+        "replacement_dictionary_after_examination": "A dictionary mapping examined and validated PIIs to placeholders enclosed in brackets.\n\n```python\n{\n    \"Alice\": \"[NAME]\",\n    \"555-123-4567\": \"[PHONE_NUMBER]\",\n    \"Palo Alto\": \"[LOCATION]\",\n    \"October 15th\": \"[DATE]\"\n}\n```"
+      },
+      {
+        "augmented": true,
+        "unanonymized_text": "John: Great advice, Lisa. I\u2019ll definitely do that. Also, I heard that you're the city's state chess champion! Congrats, that\u2019s quite an achievement.",
+        "PII_candidates": "John, Lisa, the city's, state chess champion",
+        "rationale": "Reasoning: Let's think step by step in order to produce the replacement_dictionary_after_examination. We need to identify and validate the PII candidates in the text and then create a dictionary mapping each PII to a placeholder. \n\n1. Identify the PII candidates in the text:\n   - \"John\"\n   - \"Lisa\"\n   - \"the city's\"\n   - \"state chess champion\"\n\n2. Validate the PII candidates:\n   - \"John\" and \"Lisa\" are names and should be replaced.\n   - \"the city's\" is a possessive form and may not be a PII on its own, but it can be included for completeness.\n   - \"state chess champion\" is a title and may not be a PII on its own, but it can be included for completeness.\n\n3. Create a dictionary mapping each PII to a placeholder:\n   - \"John\" -> \"[NAME1]\"\n   - \"Lisa\" -> \"[NAME2]\"\n   - \"the city's\" -> \"[LOCATION]\"\n   - \"state chess champion\" -> \"[TITLE]\"",
+        "replacement_dictionary_all_potential": "```python\n{\n    \"John\": \"[NAME1]\",\n    \"Lisa\": \"[NAME2]\",\n    \"the city's\": \"[LOCATION]\",\n    \"state chess champion\": \"[TITLE]\"\n}\n```",
+        "replacement_dictionary_after_examination": "```python\n{\n    \"John\": \"[NAME1]\",\n    \"Lisa\": \"[NAME2]\",\n    \"the city's\": \"[LOCATION]\",\n    \"state chess champion\": \"[TITLE]\"\n}\n```"
+      },
+      {
+        "augmented": true,
+        "unanonymized_text": "John: Great advice, Lisa. I\u2019ll definitely do that. Also, I heard that you're the city's state chess champion! Congrats, that\u2019s quite an achievement.",
+        "PII_candidates": "John, Lisa, the city's, state chess champion",
+        "rationale": "Reasoning: Let's think step by step in order to produce the replacement_dictionary_after_examination. We need to identify and validate the PII candidates in the text and then create a dictionary mapping each PII to a placeholder. \n\n1. Identify the PII candidates in the text:\n   - \"John\"\n   - \"Lisa\"\n   - \"the city's\"\n   - \"state chess champion\"\n\n2. Validate the PII candidates:\n   - \"John\" and \"Lisa\" are names and should be replaced.\n   - \"the city's\" is a possessive form and may not be a PII on its own, but it can be included for completeness.\n   - \"state chess champion\" is a title and may not be a PII on its own, but it can be included for completeness.\n\n3. Create a dictionary mapping each PII to a placeholder:\n   - \"John\" -> \"[NAME1]\"\n   - \"Lisa\" -> \"[NAME2]\"\n   - \"the city's\" -> \"[LOCATION]\"\n   - \"state chess champion\" -> \"[TITLE]\"",
+        "replacement_dictionary_all_potential": "```python\n{\n    \"John\": \"[NAME1]\",\n    \"Lisa\": \"[NAME2]\",\n    \"the city's\": \"[LOCATION]\",\n    \"state chess champion\": \"[TITLE]\"\n}\n```",
+        "replacement_dictionary_after_examination": "```python\n{\n    \"John\": \"[NAME1]\",\n    \"Lisa\": \"[NAME2]\",\n    \"the city's\": \"[LOCATION]\",\n    \"state chess champion\": \"[TITLE]\"\n}\n```"
+      },
+      {
+        "unanonymized_text": "Oliver: They certainly have. By the way, do you remember the old Johnson house on Elm Street?",
+        "anonymized_text": "[First Name]: They certainly have. By the way, do you remember the old [First Name] house on [Full Address]?"
+      },
+      {
+        "unanonymized_text": "Bob: Sure thing, Alice. Just message me your number as well, and I'll text you if I come across any other interesting blockchain articles.",
+        "anonymized_text": "[First Name]: Sure thing, [First Name]. Just message me your number as well, and I'll text you if I come across any other interesting blockchain articles."
+      }
+    ],
+    "signature_instructions": "\n    Generate a dictionary to replace identified PIIs in the text. Given the PII candidates and the text, \n    create a dictionary mapping each PII to a placeholder. Ensure relevant keys are included even if there are typos.\n    ",
+    "signature_prefix": "Valid Python Dict (will run eval):",
+    "extended_signature_instructions": "\n    Generate a dictionary to replace identified PIIs in the text. Given the PII candidates and the text, \n    create a dictionary mapping each PII to a placeholder. Ensure relevant keys are included even if there are typos.\n    ",
+    "extended_signature_prefix": "Valid Python Dict (will run eval):"
+  }
+}
