@@ -19,6 +19,7 @@ def test_pseudoanonymize_flow():
     response = client.post("/pseudoanonymize", json={"text": "Hi, I am Bob"})
     assert response.status_code == 200
     data = response.json()
+    print(data)
     assert "anonymizedText" in data
     assert "replacementDict" in data
     assert "deanonymizedText" in data

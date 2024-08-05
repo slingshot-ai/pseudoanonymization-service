@@ -3,6 +3,7 @@ from typing import Any, Dict
 from pseudoanonymize.base import BaseProcessor
 from pseudoanonymize.common import make_chat_completion
 from pseudoanonymize.exceptions import UnparsableLLMOutputException
+from pseudoanonymize.utils import flatten_replacement_dict
 
 chain_of_thought_prompt = f"""
 You are tasked with identifying and replacing Personally Identifiable Information (PII) in a conversation. PII includes names, addresses, dates, and any other specific information that can be used to identify an individual. Follow these steps:
@@ -186,5 +187,6 @@ class Anonymizer(BaseProcessor):
             raise UnparsableLLMOutputException(error_message)
 
         replacement_dict = self._extract_and_parse_replacement_dict(parts[1])
+        replacement_dict = flatten_replacement_dict(replacement_dict)
         anonymized_text = self._parse_replacements(text, replacement_dict)
         return {"anonymized_text": anonymized_text, "replacement_dict": replacement_dict}
