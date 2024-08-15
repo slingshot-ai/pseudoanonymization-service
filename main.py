@@ -97,6 +97,13 @@ async def anonymize_event_log(request: Request):
                 content = event.user_message_completed.message.content
                 content = content.replace("\n", " ")
                 conv += content + "\n"
+            # TODO: add user message amended
+            # TODO: add therpsiedamended
+            # TODO: add therpisted interupted (has ameneded message)
+            # TODO: add critic finished thinking (thoughts -> thoughts)
+            # TODO: session summaryGenerated -> summary -> message
+            # TODO: session feedback
+
         return conv
 
     def copy_event_log(events: EventLog):
@@ -126,6 +133,9 @@ async def anonymize_event_log(request: Request):
     try:
         request_body = await request.body()
         events = EventLog.FromString(request_body)
+        print("debug: ")
+        print(events)
+        print("-----------------")
         conv = extract_conv_from_event_log(events)
         anonymized_conversation, replacement_dict = pipeline_model.predict({"text": conv})
 
