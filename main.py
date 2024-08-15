@@ -89,11 +89,13 @@ async def anonymize_event_log(request: Request):
         """obtain the conversation as a string from the event log"""
         conv = ""
         for event in event_log.events:
-            if event.therapist_message_completed:
+            # if event.therapist_message_completed:
+            if isinstance(event, TherapistMessageCompleted):
                 content = event.therapist_message_completed.message.content
                 content = content.replace("\n", " ")
                 conv += content + "\n"
-            elif event.user_message_completed:
+            # elif event.user_message_completed:
+            if isinstance(event, UserMessageCompleted):
                 content = event.user_message_completed.message.content
                 content = content.replace("\n", " ")
                 conv += content + "\n"
@@ -133,9 +135,6 @@ async def anonymize_event_log(request: Request):
     try:
         request_body = await request.body()
         events = EventLog.FromString(request_body)
-        print("debug: ")
-        print(events)
-        print("-----------------")
         conv = extract_conv_from_event_log(events)
         anonymized_conversation, replacement_dict = pipeline_model.predict({"text": conv})
 
