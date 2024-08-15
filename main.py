@@ -17,6 +17,8 @@ from pseudoanonymize.deanonymization import Deanonymizer
 from pseudoanonymize.direct_json_anonymization import JSON_FEW_SHOT_PROMPT, JSON_SYSTEM_PROMPT, JsonDirectAnonymizer
 from pseudoanonymize.dspy_anonmization import DspyAnon
 from pseudoanonymize.exceptions import MaxRetriesExceededException
+from pseudoanonymize.pipeline import PiplelineAnon
+from pseudoanonymize.regex_anonymization import RegexAnon
 from pseudoanonymize.utils import chunk_by_line, flatten_replacement_dict
 
 app = FastAPI()
@@ -34,7 +36,8 @@ model = "gpt-4o"
 prompt = JSON_SYSTEM_PROMPT + JSON_FEW_SHOT_PROMPT
 dierct_anonymizer_gpt4o = JsonDirectAnonymizer(client=client, model=model, system_prompt=prompt)
 
-model = "ft:gpt-3.5-turbo-0125:slingshot-daniel:pii-dist-gpt3:9ekTDaTH"
+# model = "ft:gpt-3.5-turbo-0125:slingshot-daniel:pii-dist-gpt3:9ekTDaTH"
+model = "ft:gpt-3.5-turbo-0125:slingshot-daniel:pii-dist-processed:9jcKs3kP"
 prompt = JSON_SYSTEM_PROMPT
 direct_anonymizer_gpt35ft = JsonDirectAnonymizer(client=client, model=model, system_prompt=prompt)
 
@@ -75,6 +78,62 @@ class PseudoanonymizeResponse(CamelModel):
     anonymized_text: str
     replacement_dict: Dict[str, str]
     deanonymized_text: str
+
+
+pipeline_model = PiplelineAnon([DspyAnon(), RegexAnon()])
+
+
+@app.post("/anonymize_event_log")
+async def anonymize_event_log(request: Request):
+    def extract_conv_from_event_log(event_log: EventLog) -> str:
+        """obtain the conversation as a string from the event log"""
+        conv = ""
+        for event in event_log.events:
+            if event.therapist_message_completed:
+                content = event.therapist_message_completed.message.content
+                content = content.replace("\n", " ")
+                conv += content + "\n"
+            elif event.user_message_completed:
+                content = event.user_message_completed.message.content
+                content = content.replace("\n", " ")
+                conv += content + "\n"
+        return conv
+
+    def copy_event_log(events: EventLog):
+        # a simple deepcopy causes unexpected behavior, like data loss when returning the new object
+        return EventLog().FromString(events.SerializeToString())
+
+    def update_message_contents(events: EventLog, anonymized_conversation: str) -> EventLog:
+        """
+        update the message contents in the new event log with the anonymized text
+        """
+        new_event = copy_event_log(events)
+
+        anonymized_text_turns = anonymized_conversation.split(
+            "\n"
+        )  # was formatted with newlines per turn, so split on newlines to get each turn.
+
+        j = 0
+        for i, event in enumerate(events.events):
+            if event.therapist_message_completed:
+                new_event.events[i].therapist_message_completed.message.content = anonymized_text_turns[j]
+                j += 1
+            elif event.user_message_completed:
+                new_event.events[i].user_message_completed.message.content = anonymized_text_turns[j]
+                j += 1
+        return new_event
+
+    try:
+        request_body = await request.body()
+        events = EventLog.FromString(request_body)
+        conv = extract_conv_from_event_log(events)
+        anonymized_conversation, replacement_dict = pipeline_model.predict({"text": conv})
+
+        anonymized_event_log = update_message_contents(events, anonymized_conversation)
+        return Response(content=anonymized_event_log.SerializeToString(), media_type="application/protobuf")
+    except Exception as e:
+        raise e
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/anonymize", response_model=AnonymizeResponse)

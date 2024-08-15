@@ -41,9 +41,6 @@ def get_chunks(
     current_chunk = ""
     for segment in splitter(text.strip()):
         token_count = count_openai_tokens(current_chunk + connector + segment, model_name=token_count_based_on)
-        print(segment)
-        print(count_openai_tokens(segment, model_name=token_count_based_on))
-        print("--------------------")
         if token_count > max_tokens:
             chunks.append(current_chunk.strip())
 
