@@ -94,8 +94,7 @@ async def anonymize_event_log(request: Request):
                 content = event.therapist_message_completed.message.content
                 content = content.replace("\n", " ")
                 conv += content + "\n"
-            # elif event.user_message_completed:
-            if isinstance(event, UserMessageCompleted):
+            elif isinstance(event, UserMessageCompleted):
                 content = event.user_message_completed.message.content
                 content = content.replace("\n", " ")
                 conv += content + "\n"
@@ -124,10 +123,10 @@ async def anonymize_event_log(request: Request):
 
         j = 0
         for i, event in enumerate(events.events):
-            if event.therapist_message_completed:
+            if isinstance(event, TherapistMessageCompleted):
                 new_event.events[i].therapist_message_completed.message.content = anonymized_text_turns[j]
                 j += 1
-            elif event.user_message_completed:
+            elif isinstance(event, UserMessageCompleted):
                 new_event.events[i].user_message_completed.message.content = anonymized_text_turns[j]
                 j += 1
         return new_event
