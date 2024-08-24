@@ -18,7 +18,7 @@ deanonymizer = Deanonymizer(client=client)
 
 
 def get_pipeline(option: str) -> PiplelineAnon:
-
+    print("v2")
     turbo = dspy.OpenAI(model='gpt-4o', max_tokens=4096, api_key=openai_api_key)
     dspy.settings.configure(lm=turbo)
 
