@@ -2,6 +2,7 @@ import dspy
 from openai import OpenAI
 
 from pseudoanonymize.base import BaseProcessor
+from pseudoanonymize.exceptions import UnparsableLLMOutputException
 
 
 class AnonSig(dspy.Signature):
@@ -98,7 +99,11 @@ class CoTAnon(dspy.Module):
         parse_att = str_dict
         parse_att = parse_att[: parse_att.find("}") + 1]
         parse_att = parse_att[parse_att.find("{") :]
-        parse_att = eval(parse_att)  # TODO: double check how DSPy handles exceptions.
+        try:
+            parse_att = eval(parse_att)
+        except ValueError as e:
+            print(f"Error: {e}")
+            raise UnparsableLLMOutputException
         return parse_att
 
     def _parse_replacements(self, text, replacement_dict):
@@ -125,4 +130,7 @@ class DspyAnon(BaseProcessor):
     def predict(self, input_: dspy.Dict[str, dspy.Any]) -> dspy.Dict[str, dspy.Any]:
         text = input_["text"]
         prediction = self.model(text)
-        return prediction.anon_text_safe, prediction.replacement_dictionary_all_potential
+        return {
+            "replacement_dict": prediction.replacement_dictionary_all_potential,
+            "anon_text": prediction.anon_text_safe,
+        }
