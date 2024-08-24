@@ -20,6 +20,7 @@ from pseudoanonymize.utils import chunk_by_line, flatten_replacement_dict
 app = FastAPI()
 
 anonymization_pieline = get_pipeline("GPT-4o")
+print("Server started v1")
 
 
 @app.post("/anonymize_event_log")
