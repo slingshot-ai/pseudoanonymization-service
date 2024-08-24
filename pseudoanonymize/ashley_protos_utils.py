@@ -20,7 +20,7 @@ def extract_conv_from_event_log(event_log: EventLog) -> str:
     return conv
 
 
-def copy_event_log(events: EventLog):
+def copy_event_log(events: EventLog) -> EventLog:
     # a simple deepcopy causes unexpected behavior, like data loss when returning the new object
     return EventLog().FromString(events.SerializeToString())
 

@@ -17,7 +17,7 @@ client = OpenAI(api_key=openai_api_key)
 deanonymizer = Deanonymizer(client=client)
 
 
-def get_pipeline(option: str):
+def get_pipeline(option: str) -> PiplelineAnon:
 
     turbo = dspy.OpenAI(model='gpt-4o', max_tokens=4096, api_key=openai_api_key)
     dspy.settings.configure(lm=turbo)
@@ -40,5 +40,4 @@ def get_pipeline(option: str):
         "GPT-3.5-FT": PiplelineAnon([direct_anonymizer_gpt35ft, RegexAnon()]),
     }
 
-    # Return the selected pipeline model
-    return pipeline_options.get(option, None)
+    return pipeline_options[option]
